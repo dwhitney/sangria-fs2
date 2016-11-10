@@ -1,4 +1,5 @@
 # folders
+.DS_Store
 .idea
 target
 lib
