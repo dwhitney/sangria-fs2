@@ -7,7 +7,7 @@ import _root_.fs2.{Stream, Strategy, Task}
 
 object fs2{
 
-  class StreamSubscriptionStream(implicit executionContext: ExecutionContext) extends SubscriptionStream[({type λ[α] = Stream[Task, α]})#λ]{
+  class FS2SubscriptionStream(implicit executionContext: ExecutionContext) extends SubscriptionStream[Stream[Task, ?]]{
 
     implicit val strategy: Strategy = Strategy.fromExecutionContext(executionContext)
 
@@ -15,7 +15,10 @@ object fs2{
       throw e
 
     def first[T](s: Stream[Task,T]): Future[T] = 
-      s.take(1).runLast.unsafeRunAsyncFuture.map(_.get)
+      s.take(1).runLast.unsafeRunAsyncFuture.map(_.get).recoverWith{
+        case e: NoSuchElementException => Future.failed(new IllegalStateException("Promise was not completed - stream hasn't produced any elements."))
+        case e => Future.failed(e)
+      }
 
     def flatMapFuture[Ctx, Res, T](future: Future[T])(resultFn: T => Stream[Task,Res]): Stream[Task,Res] = 
       Stream.eval[Task, T](Task.fromFuture(future)).flatMap(resultFn)
@@ -27,7 +30,8 @@ object fs2{
       source.evalMap(a => Task.fromFuture(fn(a)))
 
     def merge[T](streams: Vector[Stream[Task,T]]): Stream[Task,T] = 
-      streams.foldLeft(Stream.empty[Task,T])(_.merge(_))
+      if(streams.size == 0) throw new IllegalStateException("No streams produced!") 
+      else streams.foldLeft(Stream.empty[Task,T])(_.merge(_))
 
     def onComplete[Ctx, Res](result: Stream[Task,Res])(op: => Unit): Stream[Task,Res] = 
       result.onFinalize(Task.delay(op))
@@ -41,12 +45,12 @@ object fs2{
     def singleFuture[T](value: Future[T]): Stream[Task,T] = 
       Stream.eval[Task,T](Task.fromFuture(value))
 
-    def supported[T[X]](other: SubscriptionStream[T]): Boolean = 
-      other.isInstanceOf[StreamSubscriptionStream]
+    def supported[T[_]](other: SubscriptionStream[T]): Boolean = 
+      other.isInstanceOf[FS2SubscriptionStream]
 
   }
 
-  implicit def streamSubscriptionStream(implicit executionContext: ExecutionContext): SubscriptionStream[({type λ[α] = Stream[Task, α]})#λ] =
-      new StreamSubscriptionStream
+  implicit def fs2SubscriptionStream(implicit executionContext: ExecutionContext): SubscriptionStream[Stream[Task, ?]] =
+      new FS2SubscriptionStream
 
 }

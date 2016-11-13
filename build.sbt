@@ -9,7 +9,7 @@ licenses := Seq("Apache License, ASL Version 2.0" → url("http://www.apache.org
 scalaVersion := "2.12.0"
 crossScalaVersions := Seq("2.11.8", "2.12.0")
 
-scalacOptions ++= Seq("-deprecation", "-feature")
+scalacOptions ++= Seq("-deprecation", "-feature", "-Ypartial-unification")
 
 scalacOptions ++= {
   if (scalaVersion.value startsWith "2.12")
@@ -18,13 +18,15 @@ scalacOptions ++= {
     Seq("-target:jvm-1.7")
 }
 
+addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
+
 libraryDependencies ++= Seq(
   "org.sangria-graphql" %% "sangria-streaming-api" % "0.1.1",
   "co.fs2" %% "fs2-core" % "0.9.2",
   "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 )
 
-git.remoteRepo := "git@github.com:sangria-graphql/sangria-fs2.git"
+git.remoteRepo := "git@github.com:sangria-graphql/sangria-git"
 
 // Publishing
 
@@ -57,6 +59,6 @@ startYear := Some(2016)
 organizationHomepage := Some(url("https://github.com/sangria-graphql"))
 developers := Developer("OlegIlyenko", "Oleg Ilyenko", "", url("https://github.com/OlegIlyenko")) :: Nil
 scmInfo := Some(ScmInfo(
-  browseUrl = url("https://github.com/sangria-graphql/sangria-fs2.git"),
-  connection = "scm:git:git@github.com:sangria-graphql/sangria-fs2.git"
+  browseUrl = url("https://github.com/sangria-graphql/sangria-git"),
+  connection = "scm:git:git@github.com:sangria-graphql/sangria-git"
 ))
