@@ -12,6 +12,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 class FS2IntegrationSpec extends WordSpec with Matchers {
+  implicit val strategy: Strategy = Strategy.fromExecutionContext(
+    scala.concurrent.ExecutionContext.Implicits.global)
+
   val impl: SubscriptionStream[Stream[Task, ?]] = new sangria.streaming.fs2.FS2SubscriptionStream
 
   "fs2 Integration" should {
@@ -81,7 +84,7 @@ class FS2IntegrationSpec extends WordSpec with Matchers {
         else i
       }
 
-      println(stream.onError(_ => Stream.emit(100)).runLog.unsafeRunSync)
+      println(stream.onError(_ ⇒ Stream.emit(100)).runLog.unsafeRunSync)
 
       res(impl.recover(stream)(_ ⇒ 100)) should be (Vector(1, 2, 100))
     }

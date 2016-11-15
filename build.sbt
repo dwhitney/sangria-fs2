@@ -1,6 +1,6 @@
 name := "sangria-fs2"
 organization := "org.sangria-graphql"
-version := "0.1.2-SNAPSHOT"
+version := "0.1.0-SNAPSHOT"
 
 description := "Sangria fs2 integration"
 homepage := Some(url("http://sangria-graphql.org"))
@@ -8,6 +8,7 @@ licenses := Seq("Apache License, ASL Version 2.0" → url("http://www.apache.org
 
 scalaVersion := "2.12.0"
 crossScalaVersions := Seq("2.11.8", "2.12.0")
+scalaOrganization in ThisBuild := "org.typelevel"
 
 scalacOptions ++= Seq("-deprecation", "-feature", "-Ypartial-unification")
 
