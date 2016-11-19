@@ -79,7 +79,7 @@ class FS2IntegrationSpec extends WordSpec with Matchers {
     }
 
     "recover" in {
-      val stream = Stream.emits[Task, Int](List(1, 2, 3, 4)) map { i ⇒
+      val stream = (Stream[Task, Int](1, 2) ++ Stream[Task, Int](3, 4) )map { i ⇒
         if (i == 3) throw new IllegalStateException("foo")
         else i
       }

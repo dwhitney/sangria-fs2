@@ -21,7 +21,7 @@ object fs2 {
     def flatMapFuture[Ctx, Res, T](future: Future[T])(resultFn: T ⇒ Stream[Task,Res]): Stream[Task,Res] =
       Stream.eval[Task, T](Task.fromFuture(future)).flatMap(resultFn)
 
-    def map[A, B](source: Stream[Task,A])(fn: A ⇒ B): Stream[Task,B] =
+    def map[A, B](source: Stream[Task,A])(fn: A ⇒ B): Stream[Task,B] = 
       source.map(fn)
 
     def mapFuture[A, B](source: Stream[Task,A])(fn: A ⇒ Future[B]): Stream[Task,B] =
